@@ -4,5 +4,18 @@
   "description": "A simple utility to apply the circuit breaker pattern to any asynchronous function.",
   "main": "index.js",
   "author": "Stefan Hauser",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "husky": "4.2.5",
+    "lint-staged": "10.2.11",
+    "prettier": "2.0.5"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,css,md}": "prettier --write"
+  }
 }
