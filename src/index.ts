@@ -1,3 +1,3 @@
-export function test() {
-  console.log('test')
+export function add(a: number, b: number) {
+  return a + b
 }

@@ -6,10 +6,17 @@
   "author": "Stefan Hauser",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "test": "jest"
   },
   "devDependencies": {
+    "@babel/core": "^7.11.4",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/preset-typescript": "7.10.4",
+    "@types/jest": "26.0.10",
+    "babel-jest": "^26.3.0",
     "husky": "4.2.5",
+    "jest": "26.4.1",
     "lint-staged": "10.2.11",
     "prettier": "2.0.5",
     "typescript": "3.9.7"
