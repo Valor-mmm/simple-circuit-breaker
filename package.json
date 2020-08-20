@@ -1,0 +1,8 @@
+{
+  "name": "simple-circut-breaker",
+  "version": "1.0.0",
+  "description": "A simple utility to apply the circuit breaker pattern to any asynchronous function.",
+  "main": "index.js",
+  "author": "Stefan Hauser",
+  "license": "MIT"
+}
