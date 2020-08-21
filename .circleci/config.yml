@@ -29,5 +29,5 @@ jobs:
 workflows:
   verify:
     jobs:
-      - node/lint
-      - node/test
+      - lint
+      - test
