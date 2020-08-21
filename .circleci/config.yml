@@ -29,22 +29,38 @@ jobs:
     steps:
       - checkout
       - node/install-packages:
-            pkg-manager: yarn
+          pkg-manager: yarn
       - run:
-        command: npm run semantic-release || true
-        name: Release
+          command: yarn semantic-release
+          name: Run Release
 
 workflows:
   dev_branch:
     jobs:
-      - lint
-      - test
-    ignore:
-      - master
+      - lint:
+        filters:
+          branches:
+            ignore:
+              - master
+      - test:
+          filters:
+            branches:
+              ignore:
+                - master
   master_merge:
     jobs:
-      - lint
-      - test
-      - sevmer_release
-    only:
-      - master
+      - lint:
+          filters:
+            branches:
+              only:
+                - master
+      - test:
+          filters:
+            branches:
+              only:
+                - master
+      - sevmer_release:
+          filters:
+            branches:
+              only:
+                - master
