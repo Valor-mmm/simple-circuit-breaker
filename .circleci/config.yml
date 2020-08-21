@@ -23,9 +23,19 @@ jobs:
       - run:
           command: yarn lint
           name: Run Lint
+  release:
+    executor:
+      name: node/default
+      steps:
+        - checkout
+        - node/install-packages:
+            pkg-manager: yarn
+        - run:
+          command: npm run semantic-release || true
+          name: Release
 
 workflows:
-  verify:
+  dev_branch:
     jobs:
       - lint
       - test
