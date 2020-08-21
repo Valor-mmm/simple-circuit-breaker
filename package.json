@@ -5,6 +5,10 @@
   "main": "lib/index.js",
   "author": "Stefan Hauser",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Valor-mmm/simple-circut-breaker.git"
+  },
   "scripts": {
     "build": "tsc -p .",
     "test": "jest",
