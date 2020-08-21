@@ -60,6 +60,9 @@ workflows:
               only:
                 - master
       - sevmer_release:
+          requires:
+            - lint
+            - test
           filters:
             branches:
               only:
