@@ -38,10 +38,10 @@ workflows:
   dev_branch:
     jobs:
       - lint:
-        filters:
-          branches:
-            ignore:
-              - master
+          filters:
+            branches:
+              ignore:
+                - master
       - test:
           filters:
             branches:
