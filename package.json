@@ -1,13 +1,13 @@
 {
-  "name": "simple-circut-breaker",
-  "version": "0.1.0-development",
+  "name": "simple-circuit-breaker",
+  "version": "0.0.0-development",
   "description": "A simple utility to apply the circuit breaker pattern to any asynchronous function.",
   "main": "lib/index.js",
   "author": "Stefan Hauser",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Valor-mmm/simple-circut-breaker.git"
+    "url": "https://github.com/Valor-mmm/simple-circuit-breaker.git"
   },
   "scripts": {
     "build": "tsc -p .",
