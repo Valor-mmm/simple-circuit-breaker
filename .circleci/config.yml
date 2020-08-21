@@ -23,9 +23,44 @@ jobs:
       - run:
           command: yarn lint
           name: Run Lint
+  sevmer_release:
+    executor:
+      name: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run:
+          command: yarn semantic-release
+          name: Run Release
 
 workflows:
-  verify:
+  dev_branch:
     jobs:
-      - lint
-      - test
+      - lint:
+        filters:
+          branches:
+            ignore:
+              - master
+      - test:
+          filters:
+            branches:
+              ignore:
+                - master
+  master_merge:
+    jobs:
+      - lint:
+          filters:
+            branches:
+              only:
+                - master
+      - test:
+          filters:
+            branches:
+              only:
+                - master
+      - sevmer_release:
+          filters:
+            branches:
+              only:
+                - master
