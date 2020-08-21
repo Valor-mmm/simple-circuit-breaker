@@ -1,5 +1,5 @@
 {
-  "name": "simple-circuit-breaker",
+  "name": "yet-another-circuit-breaker",
   "version": "0.0.0-development",
   "description": "A simple utility to apply the circuit breaker pattern to any asynchronous function.",
   "main": "lib/index.js",
