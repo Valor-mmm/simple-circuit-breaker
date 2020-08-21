@@ -39,3 +39,12 @@ workflows:
     jobs:
       - lint
       - test
+    ignore:
+      - master
+  master_merge:
+    jobs:
+      - lint
+      - test
+      - release
+    only:
+      - master
