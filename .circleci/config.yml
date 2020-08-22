@@ -2,6 +2,7 @@ version: 2.1
 orbs:
   node: circleci/node@4.0.0
   codecov: codecov/codecov@1.1.1
+  snyk: snyk/snyk@0.0.10
 jobs:
   test:
     executor:
@@ -35,6 +36,14 @@ jobs:
       - run:
           command: yarn lint
           name: Run Lint
+  security_audit:
+    executor:
+      name: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - snyk/scan
   sevmer_release:
     executor:
       name: node/default
@@ -59,6 +68,11 @@ workflows:
             branches:
               ignore:
                 - master
+      - security_audit:
+          filters:
+            branches:
+              ignore:
+                - master
   master_merge:
     jobs:
       - lint:
@@ -71,10 +85,16 @@ workflows:
             branches:
               only:
                 - master
+      - security_audit:
+          filters:
+            branches:
+              only:
+                - master
       - sevmer_release:
           requires:
             - lint
             - test
+            - security_audit
           filters:
             branches:
               only:
