@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
   node: circleci/node@4.0.0
-
+  codecov: codecov/codecov@1.1.1
 jobs:
   test:
     executor:
@@ -11,8 +11,20 @@ jobs:
       - node/install-packages:
           pkg-manager: yarn
       - run:
-          command: yarn test
+          command: yarn test:ci
           name: Run Unit Tests
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: ./reports/junit/
+      - store_test_results:
+          path: ./reports/junit/
+      - store_artifacts:
+          path: ./reports/junit
+      - store_artifacts:
+          path: ./coverage
+      - codecov/upload:
+          file: ./coverage/clover.xml
+      - codecov/upload:
+          file: ./coverage/lcov.info
   lint:
     executor:
       name: node/default
