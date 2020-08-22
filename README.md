@@ -4,3 +4,5 @@
 [![codecov](https://codecov.io/gh/Valor-mmm/yet-another-circuit-breaker/branch/master/graph/badge.svg)](https://codecov.io/gh/Valor-mmm/yet-another-circuit-breaker)
 
 A simple, configurable utility for the circuit breaker pattern. Wrapped around asynchronous functions.
+
+Still a WIP, though
