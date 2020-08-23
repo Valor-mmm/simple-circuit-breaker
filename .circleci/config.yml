@@ -2,6 +2,7 @@ version: 2.1
 orbs:
   node: circleci/node@4.0.0
   codecov: codecov/codecov@1.1.1
+  snyk: snyk/snyk@0.0.10
 jobs:
   test:
     executor:
@@ -35,6 +36,34 @@ jobs:
       - run:
           command: yarn lint
           name: Run Lint
+  snyk_monitor:
+    executor:
+      name: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - snyk/scan
+  yarn_audit:
+    executor:
+      name: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run:
+          name: Run yarn audit
+          command: yarn dependency-audit
+  yarn_audit_dev:
+    executor:
+      name: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run:
+          name: Run yarn audit
+          command: yarn dependency-audit:dev || true
   sevmer_release:
     executor:
       name: node/default
@@ -59,6 +88,30 @@ workflows:
             branches:
               ignore:
                 - master
+      - snyk_monitor:
+          requires:
+            - lint
+            - test
+          filters:
+            branches:
+              ignore:
+                - master
+      - yarn_audit:
+          requires:
+            - lint
+            - test
+          filters:
+            branches:
+              ignore:
+                - master
+      - yarn_audit_dev:
+          requires:
+            - lint
+            - test
+          filters:
+            branches:
+              ignore:
+                - master
   master_merge:
     jobs:
       - lint:
@@ -71,10 +124,26 @@ workflows:
             branches:
               only:
                 - master
+      - snyk_monitor:
+          requires:
+            - test
+            - lint
+          filters:
+            branches:
+              only:
+                - master
+      - yarn_audit:
+          requires:
+            - test
+            - lint
+          filters:
+            branches:
+              ignore:
+                - master
       - sevmer_release:
           requires:
-            - lint
-            - test
+            - snyk_monitor
+            - yarn_audit
           filters:
             branches:
               only:

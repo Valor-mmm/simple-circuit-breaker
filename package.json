@@ -18,7 +18,9 @@
     "lint:style": "prettier --check \"src/**\"",
     "lint": "yarn lint:style && yarn lint:ts && yarn lint:eslint",
     "format": "prettier --write \"src/**\"",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "dependency-audit": "yarn audit --groups dependencies",
+    "dependency-audit:dev": "yarn audit --groups devDependencies"
   },
   "devDependencies": {
     "@babel/core": "7.11.4",
