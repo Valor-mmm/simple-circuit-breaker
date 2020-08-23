@@ -36,7 +36,7 @@ jobs:
       - run:
           command: yarn lint
           name: Run Lint
-  security_audit:
+  snyk_monitor:
     executor:
       name: node/default
     steps:
@@ -44,6 +44,16 @@ jobs:
       - node/install-packages:
           pkg-manager: yarn
       - snyk/scan
+  yarn_audit:
+    executor:
+      name: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run:
+          name: Run yarn audit
+          command: yarn audit
   sevmer_release:
     executor:
       name: node/default
@@ -68,7 +78,18 @@ workflows:
             branches:
               ignore:
                 - master
-      - security_audit:
+      - snyk_monitor:
+          requires:
+            - lint
+            - test
+          filters:
+            branches:
+              ignore:
+                - master
+      - yarn_audit:
+          requires:
+            - lint
+            - test
           filters:
             branches:
               ignore:
@@ -85,16 +106,26 @@ workflows:
             branches:
               only:
                 - master
-      - security_audit:
+      - snyk_monitor:
+          requires:
+            - test
+            - lint
           filters:
             branches:
               only:
                 - master
+      - yarn_audit:
+          requires:
+            - test
+            - lint
+          filters:
+            branches:
+              ignore:
+                - master
       - sevmer_release:
           requires:
-            - lint
-            - test
-            - security_audit
+            - snyk_monitor
+            - yarn_audit
           filters:
             branches:
               only:
