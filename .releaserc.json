@@ -1,6 +1,7 @@
 {
   "plugins": [
     "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
     [
       "@google/semantic-release-replace-plugin",
       {
@@ -25,8 +26,9 @@
     [
       "@semantic-release/git",
       {
-        "assets": ["package.json"]
+        "assets": ["dist/**/*.{js,css}", "docs", "package.json"]
       }
-    ]
+    ],
+    "@semantic-release/npm"
   ]
 }
