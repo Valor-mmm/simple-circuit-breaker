@@ -1,3 +1,5 @@
 export enum CircuitState {
-  CLOSED, OPEN, HALF_OPEN
+  CLOSED,
+  OPEN,
+  HALF_OPEN,
 }

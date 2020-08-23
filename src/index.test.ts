@@ -1,7 +1,9 @@
-import { add } from ".";
+import { applyCircuit } from "./index";
 
-describe("Test Index", function () {
-  it("should add two numbers correctly", () => {
-    expect(add(1, 2)).toEqual(3);
+describe("Test index", () => {
+  const operation: Promise<string> = (jest.fn() as unknown) as Promise<string>;
+
+  it("should work", () => {
+    applyCircuit(operation);
   });
 });
