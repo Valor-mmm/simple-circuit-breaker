@@ -1,5 +1,8 @@
-import { mergeConfigWithDefaults, PartialCircuitConfig } from './circuitConfig';
-import { createCircuit } from './circuit';
+import {
+  mergeConfigWithDefaults,
+  PartialCircuitConfig,
+} from './circuitCreation/circuitConfig';
+import { createCircuit } from './circuitCreation/circuit';
 import { composeCircuitResult } from './circuitLogic';
 
 export const applyCircuit = <T>(
