@@ -1,6 +1,6 @@
-import { mergeConfigWithDefaults, PartialCircuitConfig } from "./circuitConfig";
-import { createCircuit } from "./circuit";
-import { composeCircuitResult } from "./circuitLogic";
+import { mergeConfigWithDefaults, PartialCircuitConfig } from './circuitConfig';
+import { createCircuit } from './circuit';
+import { composeCircuitResult } from './circuitLogic';
 
 export const applyCircuit = <T>(
   operation: Promise<T>,

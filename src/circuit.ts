@@ -1,5 +1,5 @@
-import { CircuitState } from "./circuitState";
-import { CircuitConfig } from "./circuitConfig";
+import { CircuitState } from './circuitState';
+import { CircuitConfig } from './circuitConfig';
 
 export interface Circuit<T> {
   operation: Promise<T>;
