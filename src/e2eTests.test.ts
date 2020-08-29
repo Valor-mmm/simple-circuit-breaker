@@ -2,8 +2,8 @@ import { applyCircuit } from './index';
 
 describe('Test End to End', () => {
   it('should perform a positive execution without changes', async () => {
-    const operation = Promise.resolve(0);
+    const operation = () => Promise.resolve(0);
     const test = applyCircuit(operation);
-    await expect(test).resolves.toEqual(0);
+    await expect(test.execute()).resolves.toEqual(0);
   });
 });

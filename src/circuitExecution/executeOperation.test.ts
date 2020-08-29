@@ -26,12 +26,12 @@ describe('Test executeOperation', () => {
     operation: Promise<string>,
     partialConfig?: PartialCircuitConfig,
     state = CircuitState.CLOSED
-  ): Circuit<string> => ({
+  ): Circuit<never[], string> => ({
     successCounter: 0,
     failureCounter: 0,
     state,
     config: retrieveConfig(partialConfig),
-    operation: operation,
+    operation: () => operation,
   });
 
   it('should return the correct error, if the operation fails', async () => {

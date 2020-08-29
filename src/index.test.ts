@@ -11,7 +11,11 @@ describe('Test index', () => {
     successThreshold: 0,
     timeout: 5,
   };
-  const operation: Promise<string> = (jest.fn() as unknown) as Promise<string>;
+
+  const operation: () => Promise<
+    string
+  > = (jest.fn() as unknown) as () => Promise<string>;
+
   const spiedMergeConfigWithDefaults = jest.spyOn(
     mockedMergeConfigWithDefaults,
     'mergeConfigWithDefaults'
@@ -40,7 +44,7 @@ describe('Test index', () => {
     Promise.resolve('test')
   );
 
-  expect(applyCircuit(Promise.resolve('a')));
+  expect(applyCircuit(() => Promise.resolve('a'))).resolves.toEqual('test');
   expect(spiedMergeConfigWithDefaults).toHaveBeenCalledTimes(1);
   expect(spiedCreateCircuit).toHaveBeenCalledTimes(1);
   expect(spiedComposeCircuitResult).toHaveBeenCalledTimes(1);

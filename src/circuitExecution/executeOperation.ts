@@ -2,16 +2,17 @@ import { Circuit } from '../circuitCreation/circuit';
 import { CircuitExecutionError } from './circuitExecutionError';
 import { CircuitState } from '../circuitCreation/circuitState';
 
-export interface ExecutionResult<T> {
-  result: T | CircuitExecutionError;
-  circuit: Circuit<T>;
+export interface ExecutionResult<T extends never[], U> {
+  result: U | CircuitExecutionError;
+  circuit: Circuit<T, U>;
 }
 
-export const executeOperation = async <T>(
-  circuit: Circuit<T>
-): Promise<ExecutionResult<T>> => {
+export const executeOperation = async <T extends never[], U>(
+  circuit: Circuit<T, U>,
+  ...args: T
+): Promise<ExecutionResult<T, U>> => {
   try {
-    const result = await circuit.operation;
+    const result = await circuit.operation(...args);
     return { result, circuit: handleSuccess(circuit) };
   } catch (error) {
     const executionError = new CircuitExecutionError(
@@ -22,7 +23,9 @@ export const executeOperation = async <T>(
   }
 };
 
-const handleHalfOpenSuccess = <T>(circuit: Circuit<T>): Circuit<T> => {
+const handleHalfOpenSuccess = <T extends never[], U>(
+  circuit: Circuit<T, U>
+): Circuit<T, U> => {
   const result = { ...circuit };
   result.successCounter += 1;
   if (result.successCounter >= result.config.successThreshold) {
@@ -33,7 +36,9 @@ const handleHalfOpenSuccess = <T>(circuit: Circuit<T>): Circuit<T> => {
   return result;
 };
 
-const handleSuccess = <T>(circuit: Circuit<T>): Circuit<T> => {
+const handleSuccess = <T extends never[], U>(
+  circuit: Circuit<T, U>
+): Circuit<T, U> => {
   switch (circuit.state) {
     case CircuitState.CLOSED:
       return circuit;
@@ -44,7 +49,9 @@ const handleSuccess = <T>(circuit: Circuit<T>): Circuit<T> => {
   }
 };
 
-const handleFailure = <T>(circuit: Circuit<T>): Circuit<T> => {
+const handleFailure = <T extends never[], U>(
+  circuit: Circuit<T, U>
+): Circuit<T, U> => {
   const result = { ...circuit };
   result.failureCounter += 1;
   if (result.failureCounter >= result.config.failureThreshold) {

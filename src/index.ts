@@ -4,14 +4,28 @@ import {
 } from './circuitCreation/circuitConfig';
 import { createCircuit } from './circuitCreation/circuit';
 import { composeCircuitResult } from './circuitLogic';
-import { CircuitExecutionError } from './circuitExecution/circuitExecutionError';
+import { isCircuitExecutionError } from './circuitExecution/circuitExecutionError';
 
-export const applyCircuit = <T>(
-  operation: Promise<T>,
+export interface AppliedCircuit<T> {
+  execute: T;
+}
+
+export type funcType<T extends never[], U> = (...args: T) => Promise<U>;
+
+export const applyCircuit = <T extends never[], U>(
+  operation: funcType<T, U>,
   config?: PartialCircuitConfig
-): Promise<T | CircuitExecutionError> => {
+): AppliedCircuit<funcType<T, U>> => {
   const circuitConfig = mergeConfigWithDefaults(config);
   const circuit = createCircuit(operation, circuitConfig);
 
-  return composeCircuitResult(circuit);
+  return {
+    execute: async (...args: T) => {
+      const result = await composeCircuitResult(circuit, ...args);
+      if (isCircuitExecutionError(result)) {
+        throw result;
+      }
+      return result;
+    },
+  };
 };

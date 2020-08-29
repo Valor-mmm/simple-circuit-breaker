@@ -1,18 +1,19 @@
 import { CircuitState } from './circuitState';
 import { CircuitConfig } from './circuitConfig';
+import { funcType } from '../index';
 
-export interface Circuit<T> {
-  operation: Promise<T>;
+export interface Circuit<T extends never[], U> {
+  operation: funcType<T, U>;
   failureCounter: number;
   successCounter: number;
   state: CircuitState;
   config: CircuitConfig;
 }
 
-export const createCircuit = <T>(
-  operation: Promise<T>,
+export const createCircuit = <T extends never[], U>(
+  operation: funcType<T, U>,
   config: CircuitConfig
-): Circuit<T> => ({
+): Circuit<T, U> => ({
   operation,
   failureCounter: 0,
   successCounter: 0,
