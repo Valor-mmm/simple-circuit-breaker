@@ -1,12 +1,25 @@
 import { Circuit } from './circuitCreation/circuit';
 import { executeOperation } from './circuitExecution/executeOperation';
-import { CircuitExecutionError } from './circuitExecution/circuitExecutionError';
+import { isCircuitExecutionError } from './circuitExecution/circuitExecutionError';
+import { funcType } from './index';
 
-export const composeCircuitResult = async <T extends never[], U>(
-  circuit: Circuit<T, U>,
-  ...args: T
-): Promise<U | CircuitExecutionError> => {
-  const executionResult = await executeOperation(circuit, ...args);
+export interface AppliedCircuit<T extends never[], U> {
+  execute: funcType<T, U>;
+}
 
-  return executionResult.result;
+export const composeCircuitResult = <T extends never[], U>(
+  initialCircuit: Circuit<T, U>
+): AppliedCircuit<T, U> => {
+  let circuitState = { ...initialCircuit };
+
+  return {
+    execute: async (...args: T) => {
+      const { result, circuit } = await executeOperation(circuitState, ...args);
+      circuitState = circuit;
+      if (isCircuitExecutionError(result)) {
+        throw result.error;
+      }
+      return result;
+    },
+  };
 };

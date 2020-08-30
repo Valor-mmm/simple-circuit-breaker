@@ -41,10 +41,12 @@ describe('Test index', () => {
   }));
 
   spiedComposeCircuitResult.mockImplementationOnce(() =>
-    Promise.resolve('test')
+    ({ execute: () => Promise.resolve('test')})
   );
 
-  expect(applyCircuit(() => Promise.resolve('a'))).resolves.toEqual('test');
+  expect(applyCircuit(() => Promise.resolve('a')).execute()).resolves.toEqual(
+    'test'
+  );
   expect(spiedMergeConfigWithDefaults).toHaveBeenCalledTimes(1);
   expect(spiedCreateCircuit).toHaveBeenCalledTimes(1);
   expect(spiedComposeCircuitResult).toHaveBeenCalledTimes(1);
