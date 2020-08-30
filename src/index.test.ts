@@ -40,9 +40,9 @@ describe('Test index', () => {
     successCounter: 0,
   }));
 
-  spiedComposeCircuitResult.mockImplementationOnce(() =>
-    ({ execute: () => Promise.resolve('test')})
-  );
+  spiedComposeCircuitResult.mockImplementationOnce(() => ({
+    execute: () => Promise.resolve('test'),
+  }));
 
   expect(applyCircuit(() => Promise.resolve('a')).execute()).resolves.toEqual(
     'test'

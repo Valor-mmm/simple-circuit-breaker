@@ -1,16 +1,17 @@
 import { Circuit } from '../circuitCreation/circuit';
 import { CircuitExecutionError } from './circuitExecutionError';
 import { CircuitState } from '../circuitCreation/circuitState';
+import { anyArray } from '../globalTypes';
 
-export interface ExecutionResult<T extends never[], U> {
-  result: U | CircuitExecutionError;
-  circuit: Circuit<T, U>;
+export interface ExecutionResult<P extends anyArray, R> {
+  result: R | CircuitExecutionError;
+  circuit: Circuit<P, R>;
 }
 
-export const executeOperation = async <T extends never[], U>(
-  circuit: Circuit<T, U>,
-  ...args: T
-): Promise<ExecutionResult<T, U>> => {
+export const executeOperation = async <P extends anyArray, R>(
+  circuit: Circuit<P, R>,
+  ...args: P
+): Promise<ExecutionResult<P, R>> => {
   try {
     const result = await circuit.operation(...args);
     return { result, circuit: handleSuccess(circuit) };
@@ -23,9 +24,9 @@ export const executeOperation = async <T extends never[], U>(
   }
 };
 
-const handleHalfOpenSuccess = <T extends never[], U>(
-  circuit: Circuit<T, U>
-): Circuit<T, U> => {
+const handleHalfOpenSuccess = <P extends anyArray, R>(
+  circuit: Circuit<P, R>
+): Circuit<P, R> => {
   const result = { ...circuit };
   result.successCounter += 1;
   if (result.successCounter >= result.config.successThreshold) {
@@ -36,9 +37,9 @@ const handleHalfOpenSuccess = <T extends never[], U>(
   return result;
 };
 
-const handleSuccess = <T extends never[], U>(
-  circuit: Circuit<T, U>
-): Circuit<T, U> => {
+const handleSuccess = <P extends anyArray, R>(
+  circuit: Circuit<P, R>
+): Circuit<P, R> => {
   switch (circuit.state) {
     case CircuitState.CLOSED:
       return circuit;
@@ -49,9 +50,9 @@ const handleSuccess = <T extends never[], U>(
   }
 };
 
-const handleFailure = <T extends never[], U>(
-  circuit: Circuit<T, U>
-): Circuit<T, U> => {
+const handleFailure = <P extends anyArray, R>(
+  circuit: Circuit<P, R>
+): Circuit<P, R> => {
   const result = { ...circuit };
   result.failureCounter += 1;
   if (result.failureCounter >= result.config.failureThreshold) {

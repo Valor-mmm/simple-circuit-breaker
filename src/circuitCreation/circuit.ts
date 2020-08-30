@@ -1,19 +1,19 @@
 import { CircuitState } from './circuitState';
 import { CircuitConfig } from './circuitConfig';
-import { funcType } from '../index';
+import { anyArray, funcType } from '../globalTypes';
 
-export interface Circuit<T extends never[], U> {
-  operation: funcType<T, U>;
+export interface Circuit<P extends anyArray, R> {
+  operation: funcType<P, R>;
   failureCounter: number;
   successCounter: number;
   state: CircuitState;
   config: CircuitConfig;
 }
 
-export const createCircuit = <T extends never[], U>(
-  operation: funcType<T, U>,
+export const createCircuit = <P extends anyArray, R>(
+  operation: funcType<P, R>,
   config: CircuitConfig
-): Circuit<T, U> => ({
+): Circuit<P, R> => ({
   operation,
   failureCounter: 0,
   successCounter: 0,

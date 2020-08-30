@@ -4,13 +4,12 @@ import {
 } from './circuitCreation/circuitConfig';
 import { createCircuit } from './circuitCreation/circuit';
 import { AppliedCircuit, composeCircuitResult } from './circuitLogic';
+import { anyArray, funcType } from './globalTypes';
 
-export type funcType<T extends never[], U> = (...args: T) => Promise<U>;
-
-export const applyCircuit = <T extends never[], U>(
-  operation: funcType<T, U>,
+export const applyCircuit = <P extends anyArray, R>(
+  operation: funcType<P, R>,
   config?: PartialCircuitConfig
-): AppliedCircuit<T, U> => {
+): AppliedCircuit<P, R> => {
   const circuitConfig = mergeConfigWithDefaults(config);
   const circuit = createCircuit(operation, circuitConfig);
 
