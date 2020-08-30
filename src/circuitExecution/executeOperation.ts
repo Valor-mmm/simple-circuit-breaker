@@ -1,17 +1,19 @@
 import { Circuit } from '../circuitCreation/circuit';
 import { CircuitExecutionError } from './circuitExecutionError';
 import { CircuitState } from '../circuitCreation/circuitState';
+import { anyArray } from '../globalTypes';
 
-export interface ExecutionResult<T> {
-  result: T | CircuitExecutionError;
-  circuit: Circuit<T>;
+export interface ExecutionResult<P extends anyArray, R> {
+  result: R | CircuitExecutionError;
+  circuit: Circuit<P, R>;
 }
 
-export const executeOperation = async <T>(
-  circuit: Circuit<T>
-): Promise<ExecutionResult<T>> => {
+export const executeOperation = async <P extends anyArray, R>(
+  circuit: Circuit<P, R>,
+  ...args: P
+): Promise<ExecutionResult<P, R>> => {
   try {
-    const result = await circuit.operation;
+    const result = await circuit.operation(...args);
     return { result, circuit: handleSuccess(circuit) };
   } catch (error) {
     const executionError = new CircuitExecutionError(
@@ -22,7 +24,9 @@ export const executeOperation = async <T>(
   }
 };
 
-const handleHalfOpenSuccess = <T>(circuit: Circuit<T>): Circuit<T> => {
+const handleHalfOpenSuccess = <P extends anyArray, R>(
+  circuit: Circuit<P, R>
+): Circuit<P, R> => {
   const result = { ...circuit };
   result.successCounter += 1;
   if (result.successCounter >= result.config.successThreshold) {
@@ -33,7 +37,9 @@ const handleHalfOpenSuccess = <T>(circuit: Circuit<T>): Circuit<T> => {
   return result;
 };
 
-const handleSuccess = <T>(circuit: Circuit<T>): Circuit<T> => {
+const handleSuccess = <P extends anyArray, R>(
+  circuit: Circuit<P, R>
+): Circuit<P, R> => {
   switch (circuit.state) {
     case CircuitState.CLOSED:
       return circuit;
@@ -44,7 +50,9 @@ const handleSuccess = <T>(circuit: Circuit<T>): Circuit<T> => {
   }
 };
 
-const handleFailure = <T>(circuit: Circuit<T>): Circuit<T> => {
+const handleFailure = <P extends anyArray, R>(
+  circuit: Circuit<P, R>
+): Circuit<P, R> => {
   const result = { ...circuit };
   result.failureCounter += 1;
   if (result.failureCounter >= result.config.failureThreshold) {

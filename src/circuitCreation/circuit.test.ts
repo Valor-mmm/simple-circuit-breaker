@@ -9,7 +9,7 @@ describe('Test createCircuit', () => {
       failureThreshold: 4,
       timeout: 40,
     };
-    expect(createCircuit(Promise.resolve('a'), config)).toEqual({
+    expect(createCircuit(() => Promise.resolve('a'), config)).toEqual({
       failureCounter: 0,
       successCounter: 0,
       state: CircuitState.CLOSED,

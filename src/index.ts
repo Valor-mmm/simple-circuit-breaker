@@ -3,13 +3,13 @@ import {
   PartialCircuitConfig,
 } from './circuitCreation/circuitConfig';
 import { createCircuit } from './circuitCreation/circuit';
-import { composeCircuitResult } from './circuitLogic';
-import { CircuitExecutionError } from './circuitExecution/circuitExecutionError';
+import { AppliedCircuit, composeCircuitResult } from './circuitCore';
+import { anyArray, funcType } from './globalTypes';
 
-export const applyCircuit = <T>(
-  operation: Promise<T>,
+export const applyCircuit = <P extends anyArray, R>(
+  operation: funcType<P, R>,
   config?: PartialCircuitConfig
-): Promise<T | CircuitExecutionError> => {
+): AppliedCircuit<P, R> => {
   const circuitConfig = mergeConfigWithDefaults(config);
   const circuit = createCircuit(operation, circuitConfig);
 
