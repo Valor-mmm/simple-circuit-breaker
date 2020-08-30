@@ -1,7 +1,7 @@
 import { Circuit } from '../circuitCreation/circuit';
 import { CircuitExecutionError } from './circuitExecutionError';
 import { CircuitState } from '../circuitCreation/circuitState';
-import { anyArray } from '../globalTypes';
+import { anyArray } from '../globalTypes.type';
 
 export interface ExecutionResult<P extends anyArray, R> {
   result: R | CircuitExecutionError;
