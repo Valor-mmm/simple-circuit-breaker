@@ -3,7 +3,7 @@ import {
   PartialCircuitConfig,
 } from './circuitCreation/circuitConfig';
 import { createCircuit } from './circuitCreation/circuit';
-import { AppliedCircuit, composeCircuitResult } from './circuitLogic';
+import { AppliedCircuit, composeCircuitResult } from './circuitCore';
 import { anyArray, funcType } from './globalTypes';
 
 export const applyCircuit = <P extends anyArray, R>(

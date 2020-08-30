@@ -1,7 +1,7 @@
 import { applyCircuit } from './index';
 import * as mockedMergeConfigWithDefaults from './circuitCreation/circuitConfig';
 import * as mockedCreateCircuit from './circuitCreation/circuit';
-import * as mockedComposeCircuitResult from './circuitLogic';
+import * as mockedComposeCircuitResult from './circuitCore';
 import { CircuitConfig } from './circuitCreation/circuitConfig';
 import { CircuitState } from './circuitCreation/circuitState';
 

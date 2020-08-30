@@ -5,7 +5,7 @@ import * as mockedExecuteOperation from './circuitExecution/executeOperation';
 import { Circuit } from './circuitCreation/circuit';
 import { CircuitState } from './circuitCreation/circuitState';
 import { CircuitExecutionError } from './circuitExecution/circuitExecutionError';
-import { composeCircuitResult } from './circuitLogic';
+import { composeCircuitResult } from './circuitCore';
 
 describe('Test circuitLogic', () => {
   const createCircuit = (
