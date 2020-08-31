@@ -4,7 +4,7 @@ import { PartialCircuitConfig } from './circuitCreation/circuitConfig';
 import * as mockedExecuteOperation from './circuitExecution/executeOperation';
 import { Circuit } from './circuitCreation/circuit';
 import { CircuitState } from './circuitCreation/circuitState';
-import { CircuitExecutionError } from './circuitExecution/circuitExecutionError';
+import { CircuitExecutionError } from './circuitExecution/errors/circuitExecutionError';
 import { composeCircuitResult } from './circuitCore';
 
 describe('Test circuitLogic', () => {

@@ -1,5 +1,5 @@
 import { Circuit } from '../circuitCreation/circuit';
-import { CircuitExecutionError } from './circuitExecutionError';
+import { CircuitExecutionError } from './errors/circuitExecutionError';
 import { CircuitState } from '../circuitCreation/circuitState';
 import { anyArray } from '../globalTypes.type';
 

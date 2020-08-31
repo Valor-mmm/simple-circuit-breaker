@@ -1,6 +1,6 @@
 import { Circuit } from './circuitCreation/circuit';
 import { executeOperation } from './circuitExecution/executeOperation';
-import { isCircuitExecutionError } from './circuitExecution/circuitExecutionError';
+import { isCircuitExecutionError } from './circuitExecution/errors/circuitExecutionError';
 import { anyArray, funcType } from './globalTypes.type';
 
 export interface AppliedCircuit<P extends anyArray, R> {

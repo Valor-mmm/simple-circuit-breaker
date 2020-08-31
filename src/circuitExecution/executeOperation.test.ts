@@ -8,7 +8,7 @@ import { executeOperation } from './executeOperation';
 import {
   CircuitExecutionError,
   isCircuitExecutionError,
-} from './circuitExecutionError';
+} from './errors/circuitExecutionError';
 
 describe('Test executeOperation', () => {
   const retrieveConfig = (
