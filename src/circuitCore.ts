@@ -1,7 +1,7 @@
 import { Circuit } from './circuitCreation/circuit';
-import { executeOperation } from './circuitExecution/executeOperation';
 import { isCircuitExecutionError } from './circuitExecution/errors/circuitExecutionError';
-import { anyArray, funcType } from './globalTypes.type';
+import { anyArray, funcType } from './globalTypes';
+import { executeCircuit } from './circuitExecution/executeCircuit';
 
 export interface AppliedCircuit<P extends anyArray, R> {
   execute: funcType<P, R>;
@@ -14,10 +14,10 @@ export const composeCircuitResult = <P extends anyArray, R>(
 
   return {
     execute: async (...args: P) => {
-      const { result, circuit } = await executeOperation(circuitState, ...args);
+      const { result, circuit } = await executeCircuit(circuitState, ...args);
       circuitState = circuit;
       if (isCircuitExecutionError(result)) {
-        throw result.error;
+        throw result.error ? result.error : result;
       }
       return result;
     },

@@ -1,4 +1,7 @@
-import { isOperationExecutionError, OperationExecutionError } from "./operationExecutionError";
+import {
+  isOperationExecutionError,
+  OperationExecutionError,
+} from './operationExecutionError';
 
 describe('Test OperationExecutionError', () => {
   it('should store the given parameters in properties', () => {
