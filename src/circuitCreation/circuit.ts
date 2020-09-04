@@ -1,6 +1,6 @@
 import { CircuitState } from './circuitState';
 import { CircuitConfig } from './circuitConfig';
-import { anyArray, funcType } from '../globalTypes.type';
+import { anyArray, funcType } from '../globalTypes';
 
 export interface Circuit<P extends anyArray, R> {
   operation: funcType<P, R>;

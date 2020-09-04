@@ -1,7 +1,8 @@
 import { Circuit } from '../circuitCreation/circuit';
-import { CircuitExecutionError } from './circuitExecutionError';
+import { CircuitExecutionError } from './errors/circuitExecutionError';
 import { CircuitState } from '../circuitCreation/circuitState';
-import { anyArray } from '../globalTypes.type';
+import { anyArray } from '../globalTypes';
+import { OperationExecutionError } from './errors/operationExecutionError';
 
 export interface ExecutionResult<P extends anyArray, R> {
   result: R | CircuitExecutionError;
@@ -16,7 +17,7 @@ export const executeOperation = async <P extends anyArray, R>(
     const result = await circuit.operation(...args);
     return { result, circuit: handleSuccess(circuit) };
   } catch (error) {
-    const executionError = new CircuitExecutionError(
+    const executionError = new OperationExecutionError(
       'Error during execution of operation',
       error
     );

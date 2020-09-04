@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 export class CircuitExecutionError extends Error {
-  public readonly error: any;
+  public readonly error?: any;
 
-  constructor(message: string, error: any) {
+  constructor(message: string, error?: any) {
     super(message);
     this.error = error;
   }
