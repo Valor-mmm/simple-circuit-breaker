@@ -5,7 +5,7 @@ import { CircuitState } from '../../circuitCreation/circuitState';
 describe('Test CircuitOpenedError', () => {
   it('should store the given parameters in properties', () => {
     const circuit = createTestCircuit(Promise.resolve('a'));
-    circuit.state = CircuitState.OPEN;
+    circuit.changeState(CircuitState.OPEN);
     const error = new CircuitOpenedError('test message', circuit);
     expect(error.message).toEqual('test message');
     expect(error.currentCircuitState).toEqual(CircuitState.OPEN);
@@ -13,7 +13,7 @@ describe('Test CircuitOpenedError', () => {
 
   it('should print a user centered message on toString', () => {
     const circuit = createTestCircuit(Promise.resolve('a'));
-    circuit.state = CircuitState.OPEN;
+    circuit.changeState(CircuitState.OPEN);
     const error = new CircuitOpenedError('test message', circuit);
     expect(error.toString()).toEqual(
       `CircuitOpenedError: Circuit is in state "${CircuitState.OPEN}". Underlying promise wont be executed.`
@@ -23,7 +23,7 @@ describe('Test CircuitOpenedError', () => {
   describe('Test isCircuitOpenedError', () => {
     it('should return true if, the type is circuitExecutionError', () => {
       const circuit = createTestCircuit(Promise.resolve('a'));
-      circuit.state = CircuitState.OPEN;
+      circuit.changeState(CircuitState.OPEN);
       const error = new CircuitOpenedError('test message', circuit);
       expect(isCircuitOpenedError(error)).toEqual(true);
     });

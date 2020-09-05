@@ -14,7 +14,7 @@ export const executeCircuit = async <P extends anyArray, R>(
   circuit: Circuit<P, R>,
   ...args: P
 ): Promise<ExecutionResult<P, R>> => {
-  switch (circuit.state) {
+  switch (circuit.getState()) {
     case CircuitState.CLOSED:
       return executeOperation(circuit, ...args);
     case CircuitState.OPEN:
@@ -26,7 +26,7 @@ export const executeCircuit = async <P extends anyArray, R>(
       return {
         circuit,
         result: new CircuitExecutionError(
-          `Cannot execute circuit in state: ` + circuit.state
+          `Cannot execute circuit in state: ` + circuit.getState()
         ),
       };
   }

@@ -28,7 +28,7 @@ describe('Test executeCircuit', () => {
   it('CLOSED: should return a CircuitOpenedError', async () => {
     expect.assertions(2);
     const testCircuit = createTestCircuit(Promise.resolve('result'));
-    testCircuit.state = CircuitState.OPEN;
+    testCircuit.changeState(CircuitState.OPEN);
     const { result, circuit } = await executeCircuit(testCircuit);
     expect(result).toBeInstanceOf(CircuitOpenedError);
     expect(circuit).toEqual(testCircuit);
@@ -37,7 +37,9 @@ describe('Test executeCircuit', () => {
   it('DEFAULT: should return a CircuitExecutionError', async () => {
     expect.assertions(2);
     const testCircuit = createTestCircuit(Promise.resolve('result'));
-    testCircuit.state = ('some state which is not valid' as unknown) as CircuitState;
+    testCircuit.changeState(
+      ('some state which is not valid' as unknown) as CircuitState
+    );
     const { result, circuit } = await executeCircuit(testCircuit);
     expect(result).toBeInstanceOf(CircuitExecutionError);
     expect(circuit).toEqual(testCircuit);

@@ -14,7 +14,7 @@ export const executeOperation = async <P extends anyArray, R>(
   ...args: P
 ): Promise<ExecutionResult<P, R>> => {
   try {
-    const result = await circuit.operation(...args);
+    const result = await circuit.getOperation()(...args);
     return { result, circuit: handleSuccess(circuit) };
   } catch (error) {
     const executionError = new OperationExecutionError(
@@ -30,8 +30,8 @@ const handleHalfOpenSuccess = <P extends anyArray, R>(
 ): Circuit<P, R> => {
   const result = { ...circuit };
   result.successCounter += 1;
-  if (result.successCounter >= result.config.successThreshold) {
-    result.state = CircuitState.CLOSED;
+  if (result.successCounter >= result.getConfig().successThreshold) {
+    result.changeState(CircuitState.CLOSED);
     result.successCounter = 0;
     result.failureCounter = 0;
   }
@@ -41,7 +41,7 @@ const handleHalfOpenSuccess = <P extends anyArray, R>(
 const handleSuccess = <P extends anyArray, R>(
   circuit: Circuit<P, R>
 ): Circuit<P, R> => {
-  switch (circuit.state) {
+  switch (circuit.getState()) {
     case CircuitState.CLOSED:
       return circuit;
     case CircuitState.HALF_OPEN:
@@ -56,8 +56,8 @@ const handleFailure = <P extends anyArray, R>(
 ): Circuit<P, R> => {
   const result = { ...circuit };
   result.failureCounter += 1;
-  if (result.failureCounter >= result.config.failureThreshold) {
-    result.state = CircuitState.OPEN;
+  if (result.failureCounter >= result.getConfig().failureThreshold) {
+    result.changeState(CircuitState.OPEN);
     result.failureCounter = 0;
     result.successCounter = 0;
   }
