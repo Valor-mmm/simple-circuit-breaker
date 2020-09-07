@@ -16,7 +16,7 @@ export class CircuitOpenedError<
   constructor(message: string, circuit: Circuit<P, R>) {
     super(message);
     this.circuit = circuit;
-    this.currentCircuitState = circuit.state;
+    this.currentCircuitState = circuit.getState();
   }
 
   public toString() {

@@ -3,19 +3,9 @@ import * as mockedMergeConfigWithDefaults from './circuitCreation/circuitConfig'
 import * as mockedCreateCircuit from './circuitCreation/circuit';
 import * as mockedComposeCircuitResult from './circuitCore';
 import { CircuitConfig } from './circuitCreation/circuitConfig';
-import { CircuitState } from './circuitCreation/circuitState';
+import { createTestCircuit, createTestConfig } from './utils/test.utils';
 
 describe('Test index', () => {
-  const config: CircuitConfig = {
-    failureThreshold: 1,
-    successThreshold: 0,
-    timeout: 5,
-  };
-
-  const operation: () => Promise<
-    string
-  > = (jest.fn() as unknown) as () => Promise<string>;
-
   const spiedMergeConfigWithDefaults = jest.spyOn(
     mockedMergeConfigWithDefaults,
     'mergeConfigWithDefaults'
@@ -28,17 +18,13 @@ describe('Test index', () => {
 
   it('should call functions with correct parameters', () => {
     spiedMergeConfigWithDefaults.mockImplementationOnce(
-      (): CircuitConfig => config
+      (): CircuitConfig => createTestConfig()
     );
   });
 
-  spiedCreateCircuit.mockImplementationOnce(() => ({
-    failureCounter: 10,
-    operation,
-    config,
-    state: CircuitState.CLOSED,
-    successCounter: 0,
-  }));
+  spiedCreateCircuit.mockImplementationOnce(() =>
+    createTestCircuit(Promise.resolve(0))
+  );
 
   spiedComposeCircuitResult.mockImplementationOnce(() => ({
     execute: () => Promise.resolve('test'),

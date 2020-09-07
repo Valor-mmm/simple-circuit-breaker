@@ -1,20 +1,128 @@
 import { createCircuit } from './circuit';
-import { CircuitConfig } from './circuitConfig';
 import { CircuitState } from './circuitState';
+import { createTestConfig } from '../utils/test.utils';
 
 describe('Test createCircuit', () => {
-  it('should create a default circuit', () => {
-    const config: CircuitConfig = {
-      successThreshold: 1,
-      failureThreshold: 4,
-      timeout: 40,
-    };
-    expect(createCircuit(() => Promise.resolve('a'), config)).toEqual({
-      failureCounter: 0,
-      successCounter: 0,
-      state: CircuitState.CLOSED,
-      operation: expect.anything(),
-      config,
+  it('should create a default circuit', async () => {
+    const config = createTestConfig();
+    const circuit = createCircuit(() => Promise.resolve('a'), config);
+
+    expect(circuit.getState()).toEqual(CircuitState.CLOSED);
+    expect(circuit.getConfig()).toEqual(config);
+    expect(circuit.failureCounter).toEqual(0);
+    expect(circuit.successCounter).toEqual(0);
+    await expect(circuit.getOperation()()).resolves.toEqual('a');
+  });
+
+  describe('getState', () => {
+    it('should return the current state', () => {
+      const config = createTestConfig();
+      const circuit = createCircuit(() => Promise.resolve('a'), config);
+      expect(circuit.getState()).toEqual(CircuitState.CLOSED);
+    });
+  });
+
+  describe('changeState', () => {
+    it('should update the circuit state from CLOSED to OPEN', () => {
+      const config = createTestConfig();
+      const circuit = createCircuit(() => Promise.resolve('a'), config);
+
+      expect(circuit.getState()).toEqual(CircuitState.CLOSED);
+      circuit.changeState(CircuitState.OPEN);
+      expect(circuit.getState()).toEqual(CircuitState.OPEN);
+    });
+
+    it('should update the circuit state from OPEN to HALF_OPEN', () => {
+      const config = createTestConfig();
+      const circuit = createCircuit(() => Promise.resolve('a'), config);
+
+      circuit.changeState(CircuitState.OPEN);
+      expect(circuit.getState()).not.toEqual(CircuitState.HALF_OPEN);
+      circuit.changeState(CircuitState.HALF_OPEN);
+      expect(circuit.getState()).toEqual(CircuitState.HALF_OPEN);
+    });
+
+    it('should update the circuit state from HALF_OPEN to CLOSED', () => {
+      const config = createTestConfig();
+      const circuit = createCircuit(() => Promise.resolve('a'), config);
+
+      circuit.changeState(CircuitState.OPEN);
+      circuit.changeState(CircuitState.HALF_OPEN);
+      expect(circuit.getState()).not.toEqual(CircuitState.CLOSED);
+      circuit.changeState(CircuitState.CLOSED);
+      expect(circuit.getState()).toEqual(CircuitState.CLOSED);
+    });
+
+    it('should update the circuit state from HALF_OPEN to OPEN', () => {
+      const config = createTestConfig();
+      const circuit = createCircuit(() => Promise.resolve('a'), config);
+
+      circuit.changeState(CircuitState.OPEN);
+      circuit.changeState(CircuitState.HALF_OPEN);
+      expect(circuit.getState()).not.toEqual(CircuitState.OPEN);
+      circuit.changeState(CircuitState.OPEN);
+      expect(circuit.getState()).toEqual(CircuitState.OPEN);
+    });
+
+    it('should NOT update the circuit state from CLOSED to HALF_OPEN', () => {
+      const config = createTestConfig();
+      const circuit = createCircuit(() => Promise.resolve('a'), config);
+
+      expect(circuit.getState()).toEqual(CircuitState.CLOSED);
+      // TODO: activate test after changeState logic has been fully implemented
+      // expect(circuit.changeState(CircuitState.HALF_OPEN)).toThrowErrorMatchingInlineSnapshot();
+    });
+
+    it('should NOT update the circuit state from OPEN to CLOSED', () => {
+      const config = createTestConfig();
+      const circuit = createCircuit(() => Promise.resolve('a'), config);
+
+      circuit.changeState(CircuitState.OPEN);
+      expect(circuit.getState()).toEqual(CircuitState.OPEN);
+      // TODO: activate test after changeState logic has been fully implemented
+      // expect(circuit.changeState(CircuitState.CLOSED)).toThrowErrorMatchingInlineSnapshot();
+    });
+  });
+
+  describe('updateConfig', () => {
+    it('should update the existing config with the provided values', () => {
+      const config = createTestConfig({ failureCounterResetInterval: 10 });
+      const circuit = createCircuit(() => Promise.resolve('a'), config);
+
+      expect(circuit.getConfig()).toEqual(config);
+      circuit.updateConfig({ failureCounterResetInterval: 2 });
+      expect(circuit.getConfig()).toEqual({
+        ...config,
+        failureCounterResetInterval: 2,
+      });
+    });
+  });
+
+  describe('getConfig', () => {
+    it('should return the current config', () => {
+      const config = createTestConfig();
+      const circuit = createCircuit(() => Promise.resolve('a'), config);
+      expect(circuit.getConfig()).toEqual(config);
+    });
+
+    it('should not be able to change the config properties using the returned config', () => {
+      const config = createTestConfig({ successThreshold: 4 });
+      const circuit = createCircuit(() => Promise.resolve('a'), config);
+      const retrievedConfig = circuit.getConfig();
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      // noinspection JSConstantReassignment
+      retrievedConfig.successThreshold = 5;
+      expect(circuit.getConfig().successThreshold).toEqual(4);
+    });
+  });
+
+  describe('getOperation', () => {
+    it('should return the operation function', () => {
+      const config = createTestConfig();
+      const circuit = createCircuit(() => Promise.resolve('a'), config);
+      expect(circuit.getOperation()()).resolves.toEqual('a');
     });
   });
 });
