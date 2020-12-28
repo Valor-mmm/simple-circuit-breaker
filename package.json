@@ -1,6 +1,6 @@
 {
   "name": "yet-another-circuit-breaker",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "A simple utility to apply the circuit breaker pattern to any asynchronous function.",
   "main": "lib/index.js",
   "author": "Stefan Hauser",
