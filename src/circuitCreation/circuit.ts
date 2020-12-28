@@ -61,6 +61,15 @@ export const createCircuit = <P extends anyArray, R>(
     );
   };
 
+  const failureCountResetTimeout = () => {
+    privateCircuit.executionCounters.failureCounter.reset();
+  };
+
+  setInterval(
+    failureCountResetTimeout,
+    privateCircuit.config.failureCounterResetInterval
+  );
+
   return {
     updateConfig: (newConfig) => {
       privateCircuit.config = mergeConfigs(newConfig, privateCircuit.config);

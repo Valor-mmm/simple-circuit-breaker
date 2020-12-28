@@ -11,6 +11,24 @@ describe('Test createCircuit', () => {
     jest.useRealTimers();
   });
 
+  it('should reset the failure counter after the defined time', () => {
+    const config = createTestConfig({ failureCounterResetInterval: 100 });
+    const circuit = createCircuit(() => Promise.reject('a'), config);
+    expect(circuit.executionCounters.failureCounter.getValue()).toEqual(0);
+
+    // Does nothing, if failure counter is already 0
+    jest.advanceTimersByTime(150);
+    expect(circuit.executionCounters.failureCounter.getValue()).toEqual(0);
+
+    // Increase failure timer
+    circuit.executionCounters.failureCounter.increase();
+    expect(circuit.executionCounters.failureCounter.getValue()).toEqual(1);
+
+    // Expect timer to be reset after specified number of times
+    jest.advanceTimersByTime(150);
+    expect(circuit.executionCounters.failureCounter.getValue()).toEqual(0);
+  });
+
   it('should create a default circuit', async () => {
     const config = createTestConfig();
     const circuit = createCircuit(() => Promise.resolve('a'), config);
