@@ -3,8 +3,9 @@ import {
   CircuitConfig,
   PartialCircuitConfig,
 } from '../circuitCreation/circuitConfig';
-import { CircuitState } from '../circuitCreation/circuitState';
+import { CircuitState } from '../circuitCreation/circuitState/circuitState';
 import { Circuit } from '../circuitCreation/circuit';
+import { createExecutionCounter } from '../circuitCreation/executionCounter';
 
 export const createTestConfig = (
   partialConfig?: PartialCircuitConfig
@@ -26,8 +27,10 @@ export const createTestCircuit = <P extends anyArray, R>(
   let circuitState: CircuitState = state;
 
   return {
-    successCounter: 0,
-    failureCounter: 0,
+    executionCounters: {
+      successCounter: createExecutionCounter('successCounter'),
+      failureCounter: createExecutionCounter('failureCounter'),
+    },
     // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     updateConfig: (_config) => undefined,
     getConfig: () => createTestConfig(partialConfig),

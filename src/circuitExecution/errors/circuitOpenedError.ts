@@ -4,7 +4,7 @@
 import { CircuitExecutionError } from './circuitExecutionError';
 import { Circuit } from '../../circuitCreation/circuit';
 import { anyArray } from '../../globalTypes';
-import { CircuitState } from '../../circuitCreation/circuitState';
+import { CircuitState } from '../../circuitCreation/circuitState/circuitState';
 
 export class CircuitOpenedError<
   P extends anyArray,
@@ -12,15 +12,19 @@ export class CircuitOpenedError<
 > extends CircuitExecutionError {
   private readonly circuit: Circuit<P, R>;
   public readonly currentCircuitState: CircuitState;
+  public readonly failureThreshold: number;
+  public readonly failureCount: number;
 
-  constructor(message: string, circuit: Circuit<P, R>) {
-    super(message);
+  constructor(circuit: Circuit<P, R>, message?: string) {
+    super(
+      message
+        ? message
+        : `CircuitOpenedError: Circuit is in state "${circuit.getState()}". Underlying operation wont be executed.`
+    );
     this.circuit = circuit;
     this.currentCircuitState = circuit.getState();
-  }
-
-  public toString() {
-    return `CircuitOpenedError: Circuit is in state "${this.currentCircuitState}". Underlying promise wont be executed.`;
+    this.failureCount = circuit.executionCounters.failureCounter.getValue();
+    this.failureThreshold = circuit.getConfig().failureThreshold;
   }
 }
 

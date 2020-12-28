@@ -21,7 +21,9 @@ describe('Test circuitLogic', () => {
         }));
 
         await expect(composeCircuitResult(circuit).execute()).rejects.toEqual(
-          'error'
+          expect.objectContaining({
+            error: 'error',
+          })
         );
         expect(executeCircuitSpy).toHaveBeenCalledTimes(1);
       });
@@ -29,7 +31,7 @@ describe('Test circuitLogic', () => {
       it('should throw the underlying error, if the circuit is closed', async () => {
         const circuit = createTestCircuit(Promise.resolve('result'));
         executeCircuitSpy.mockImplementation(() => ({
-          result: new CircuitOpenedError('some message', circuit),
+          result: new CircuitOpenedError(circuit),
           circuit: circuit,
         }));
 

@@ -1,4 +1,4 @@
-import { CircuitState } from '../circuitCreation/circuitState';
+import { CircuitState } from '../circuitCreation/circuitState/circuitState';
 import { executeOperation } from './executeOperation';
 import {
   CircuitExecutionError,
@@ -58,14 +58,20 @@ describe('Test executeOperation', () => {
     });
 
     it('should increase the successCounter, if the circuit state is half-open', async () => {
+      expect.assertions(2);
+
       const operation = Promise.resolve('some result');
       const circuit = createTestCircuit(operation, {}, CircuitState.HALF_OPEN);
 
-      await expect(executeOperation(circuit)).resolves.toEqual(
+      const result = await executeOperation(circuit);
+      expect(result).toEqual(
         expect.objectContaining({
-          circuit: { ...circuit, successCounter: 1 },
+          circuit: { ...circuit },
         })
       );
+      expect(
+        result.circuit.executionCounters.successCounter.getValue()
+      ).toEqual(1);
     });
 
     it('should keep the circuit at half-open, if the successThreshold is NOT reached', async () => {
@@ -76,12 +82,14 @@ describe('Test executeOperation', () => {
 
       const result = await executeOperation(circuit);
 
-      expect(result.circuit.successCounter).toEqual(1);
+      expect(
+        result.circuit.executionCounters.successCounter.getValue()
+      ).toEqual(1);
       expect(result.circuit.getState()).toEqual(CircuitState.HALF_OPEN);
     });
 
     it('should close the circuit, it the successThreshold is reached', async () => {
-      expect.assertions(3);
+      expect.assertions(2);
 
       const operation = Promise.resolve('some result');
       const circuit = createTestCircuit(
@@ -92,8 +100,9 @@ describe('Test executeOperation', () => {
 
       const result = await executeOperation(circuit);
 
-      expect(result.circuit.failureCounter).toEqual(0);
-      expect(result.circuit.successCounter).toEqual(0);
+      expect(
+        result.circuit.executionCounters.failureCounter.getValue()
+      ).toEqual(0);
       expect(result.circuit.getState()).toEqual(CircuitState.CLOSED);
     });
   });
@@ -103,11 +112,16 @@ describe('Test executeOperation', () => {
       const operation = Promise.reject('some error');
       const circuit = createTestCircuit(operation);
 
-      await expect(executeOperation(circuit)).resolves.toEqual(
+      const result = await executeOperation(circuit);
+      expect(result).toEqual(
         expect.objectContaining({
-          circuit: { ...circuit, failureCounter: 1 },
+          circuit: { ...circuit },
         })
       );
+
+      expect(
+        result.circuit.executionCounters.failureCounter.getValue()
+      ).toEqual(1);
     });
 
     it('should keep the circuit closed, if the errorThreshold is NOT reached', async () => {
@@ -118,19 +132,20 @@ describe('Test executeOperation', () => {
 
       const result = await executeOperation(circuit);
 
-      expect(result.circuit.failureCounter).toEqual(1);
+      expect(
+        result.circuit.executionCounters.failureCounter.getValue()
+      ).toEqual(1);
       expect(result.circuit.getState()).toEqual(CircuitState.CLOSED);
     });
 
     it('should open the circuit, if the errorThreshold is reached', async () => {
-      expect.assertions(2);
+      expect.assertions(1);
 
       const operation = Promise.reject('some error');
       const circuit = createTestCircuit(operation, { failureThreshold: 1 });
 
       const result = await executeOperation(circuit);
 
-      expect(result.circuit.failureCounter).toEqual(0);
       expect(result.circuit.getState()).toEqual(CircuitState.OPEN);
     });
   });
