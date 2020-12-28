@@ -1,16 +1,42 @@
-import { createCircuit } from './circuit';
-import { CircuitState } from './circuitState';
+import { Circuit, createCircuit } from './circuit';
+import { CircuitState } from './circuitState/circuitState';
 import { createTestConfig } from '../utils/test.utils';
 
 describe('Test createCircuit', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('should reset the failure counter after the defined time', () => {
+    const config = createTestConfig({ failureCounterResetInterval: 100 });
+    const circuit = createCircuit(() => Promise.reject('a'), config);
+    expect(circuit.executionCounters.failureCounter.getValue()).toEqual(0);
+
+    // Does nothing, if failure counter is already 0
+    jest.advanceTimersByTime(150);
+    expect(circuit.executionCounters.failureCounter.getValue()).toEqual(0);
+
+    // Increase failure timer
+    circuit.executionCounters.failureCounter.increase();
+    expect(circuit.executionCounters.failureCounter.getValue()).toEqual(1);
+
+    // Expect timer to be reset after specified number of times
+    jest.advanceTimersByTime(150);
+    expect(circuit.executionCounters.failureCounter.getValue()).toEqual(0);
+  });
+
   it('should create a default circuit', async () => {
     const config = createTestConfig();
     const circuit = createCircuit(() => Promise.resolve('a'), config);
 
     expect(circuit.getState()).toEqual(CircuitState.CLOSED);
     expect(circuit.getConfig()).toEqual(config);
-    expect(circuit.failureCounter).toEqual(0);
-    expect(circuit.successCounter).toEqual(0);
+    expect(circuit.executionCounters.successCounter.getValue()).toEqual(0);
+    expect(circuit.executionCounters.failureCounter.getValue()).toEqual(0);
     await expect(circuit.getOperation()()).resolves.toEqual('a');
   });
 
@@ -23,6 +49,22 @@ describe('Test createCircuit', () => {
   });
 
   describe('changeState', () => {
+    describe('half-open timeout handler', () => {
+      const config = createTestConfig({ timeout: 100 });
+      let circuit: Circuit<[], string>;
+
+      beforeEach(() => {
+        circuit = createCircuit(() => Promise.resolve('a'), config);
+        circuit.changeState(CircuitState.OPEN);
+      });
+
+      it('should switch the state from OPEN to HALF-OPEN', () => {
+        jest.advanceTimersByTime(150);
+
+        expect(circuit.getState()).toEqual(CircuitState.HALF_OPEN);
+      });
+    });
+
     it('should update the circuit state from CLOSED to OPEN', () => {
       const config = createTestConfig();
       const circuit = createCircuit(() => Promise.resolve('a'), config);
@@ -69,8 +111,15 @@ describe('Test createCircuit', () => {
       const circuit = createCircuit(() => Promise.resolve('a'), config);
 
       expect(circuit.getState()).toEqual(CircuitState.CLOSED);
-      // TODO: activate test after changeState logic has been fully implemented
-      // expect(circuit.changeState(CircuitState.HALF_OPEN)).toThrowErrorMatchingInlineSnapshot();
+
+      expect(() => {
+        circuit.changeState(CircuitState.HALF_OPEN);
+      }).toThrowError(
+        expect.objectContaining({
+          previousState: CircuitState.CLOSED,
+          nextState: CircuitState.HALF_OPEN,
+        })
+      );
     });
 
     it('should NOT update the circuit state from OPEN to CLOSED', () => {
@@ -79,8 +128,15 @@ describe('Test createCircuit', () => {
 
       circuit.changeState(CircuitState.OPEN);
       expect(circuit.getState()).toEqual(CircuitState.OPEN);
-      // TODO: activate test after changeState logic has been fully implemented
-      // expect(circuit.changeState(CircuitState.CLOSED)).toThrowErrorMatchingInlineSnapshot();
+
+      expect(() => {
+        circuit.changeState(CircuitState.CLOSED);
+      }).toThrowError(
+        expect.objectContaining({
+          previousState: CircuitState.OPEN,
+          nextState: CircuitState.CLOSED,
+        })
+      );
     });
   });
 

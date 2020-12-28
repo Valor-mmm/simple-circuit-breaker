@@ -1,15 +1,24 @@
-import { CircuitState } from './circuitState';
+import { CircuitState } from './circuitState/circuitState';
 import {
   CircuitConfig,
   mergeConfigs,
   PartialCircuitConfig,
 } from './circuitConfig';
 import { anyArray, funcType } from '../globalTypes';
+import { createExecutionCounter, ExecutionCounter } from './executionCounter';
+import { handleCircuitChange } from './circuitState/handleCircuitState';
 
-interface PrivateCircuit<P extends anyArray, R> {
+interface ExecutionCounters {
+  failureCounter: ExecutionCounter;
+  successCounter: ExecutionCounter;
+}
+
+export interface PrivateCircuit<P extends anyArray, R> {
   operation: funcType<P, R>;
   state: CircuitState;
   config: CircuitConfig;
+  executionCounters: ExecutionCounters;
+  halfOpenTimeoutRef?: NodeJS.Timeout;
 }
 
 export interface Circuit<P extends anyArray, R> {
@@ -18,31 +27,63 @@ export interface Circuit<P extends anyArray, R> {
   changeState: (newState: CircuitState) => void;
   getState: () => Readonly<CircuitState>;
   getOperation: () => funcType<P, R>;
-  failureCounter: number;
-  successCounter: number;
+  executionCounters: ExecutionCounters;
 }
 
 export const createCircuit = <P extends anyArray, R>(
   operation: funcType<P, R>,
   config: CircuitConfig
 ): Circuit<P, R> => {
-  const circuitState: PrivateCircuit<P, R> = {
+  let privateCircuit: PrivateCircuit<P, R> = {
     operation,
     state: CircuitState.CLOSED,
     config: config,
+    executionCounters: {
+      failureCounter: createExecutionCounter('failureCounter'),
+      successCounter: createExecutionCounter('successCounter'),
+    },
   };
+
+  const halfOpenTimeoutHandler = () => {
+    if (privateCircuit.state !== CircuitState.OPEN) {
+      throw new Error(
+        'Implementation error: Timeout should only resolve during open state'
+      );
+    }
+    privateCircuit = handleCircuitChange(
+      privateCircuit,
+      CircuitState.HALF_OPEN,
+      () => {
+        throw new Error(
+          'Implementation error: should never call this function while handling the current state switch.'
+        );
+      }
+    );
+  };
+
+  const failureCountResetTimeout = () => {
+    privateCircuit.executionCounters.failureCounter.reset();
+  };
+
+  setInterval(
+    failureCountResetTimeout,
+    privateCircuit.config.failureCounterResetInterval
+  );
 
   return {
     updateConfig: (newConfig) => {
-      circuitState.config = mergeConfigs(newConfig, circuitState.config);
+      privateCircuit.config = mergeConfigs(newConfig, privateCircuit.config);
     },
-    getConfig: () => ({ ...circuitState.config }),
+    getConfig: () => ({ ...privateCircuit.config }),
     changeState: (newState) => {
-      circuitState.state = newState;
+      privateCircuit = handleCircuitChange(
+        privateCircuit,
+        newState,
+        halfOpenTimeoutHandler
+      );
     },
-    getState: () => circuitState.state.valueOf(),
-    getOperation: () => (...args: P) => circuitState.operation(...args),
-    failureCounter: 0,
-    successCounter: 0,
+    getState: () => privateCircuit.state,
+    getOperation: () => (...args: P) => privateCircuit.operation(...args),
+    executionCounters: privateCircuit.executionCounters,
   };
 };
