@@ -3,12 +3,20 @@
   "version": "1.9.0",
   "description": "A simple utility to apply the circuit breaker pattern to any asynchronous function.",
   "main": "lib/index.js",
-  "author": "Stefan Hauser",
+  "types": "lib/index.d.ts",
+  "author": {
+    "name": "Stefan Hauser",
+    "email": "stefan.hauser.dev@gmail.com"
+  },
+  "files": [
+    "lib/**/*"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Valor-mmm/simple-circuit-breaker.git"
   },
+  "keywords": ["circuit", "breaker", "simple", "pattern"],
   "scripts": {
     "build": "tsc -p .",
     "test": "jest",
@@ -20,7 +28,9 @@
     "format": "prettier --write \"src/**\"",
     "semantic-release": "semantic-release",
     "dependency-audit": "yarn audit --groups dependencies",
-    "dependency-audit:dev": "yarn audit --groups devDependencies"
+    "dependency-audit:dev": "yarn audit --groups devDependencies",
+    "prepare": "yarn build",
+    "prepublishOnly": "yarn lint && yarn test:ci && yarn dependency-audit"
   },
   "devDependencies": {
     "@babel/core": "7.11.4",
@@ -40,7 +50,7 @@
     "jest-junit": "11.1.0",
     "lint-staged": "10.2.11",
     "prettier": "2.0.5",
-    "semantic-release": "^17.1.1",
+    "semantic-release": "17.1.1",
     "typescript": "3.9.7"
   },
   "husky": {
